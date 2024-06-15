@@ -5,7 +5,7 @@ import * as yup from "yup";
 import MkdSDK from "../utils/MkdSDK";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../authContext";
-import { useState } from "react";
+import Snackbar from './Snackbar';
 
 const AdminLoginPage = () => {
   const schema = yup
@@ -26,34 +26,16 @@ const AdminLoginPage = () => {
     resolver: yupResolver(schema),
   });
 
-  // Snackbar implementation
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-
-  const Snackbar = ({ message, isOpen, onClose }) => {
-    if (!isOpen) return null;
-      return(
-        <div>
-          <span>{message}</span>
-          <button onClick={onClose} className="ml-2"> x </button>
-        </div>
-      )
-  }
-
   const onSubmit = async (data) => {
     let sdk = new MkdSDK();
     //TODO
     try {
-      
       const resp = await sdk.login(data.email, data.password, 'admin');
-      dispatch({type: 'LOGIN_SUCCESS' , resp});
-      setSnackbarOpen(true);
-      setSnackbarMessage(`Logged in successfully as ${data.email}`);
-      setTimeout(() => {
-        setSnackbarOpen(false);
-      }, 3000);
+      dispatch({ type: 'LOGIN_SUCCESS', resp });
+      Snackbar.open(`Logged in successfully as ${data.email}`); 
+      window.location.href = "/AdminDashboardPage";
     } catch (error) {
-        console.log('Submit error ->', error)
+      console.log('Submit error ->', error)
     }
   };
 

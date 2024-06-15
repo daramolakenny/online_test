@@ -75,7 +75,7 @@ const AuthProvider = ({ children }) => {
       if (expireAt && currentTime >= expireAt) {
         tokenExpireError(dispatch, "TOKEN_EXPIRED");
       }
-    }, 1000); // check every second
+    }, 1000);
 
     return () => clearInterval(intervalId);
   }, []);

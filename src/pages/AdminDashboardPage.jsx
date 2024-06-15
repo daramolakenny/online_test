@@ -1,6 +1,7 @@
 import React from "react";
 import axios from 'axios';
 import { useState, useEffect } from "react";
+import { useDrag, useDrop } from 'react-dnd';
 
 const AdminDashboardPage = () => {
   const [videos, setVideos] = useState([]);
@@ -12,17 +13,19 @@ const AdminDashboardPage = () => {
   }, []);
 
   const fetchVideos = async () => {
-    const response = await axios.post('(link unavailable)', {
-      payload: {},
-      page,
-      limit: 10
-    }, {
-      headers: {
-        'x-project': 'cmVhY3R0YXNrOmQ5aGVkeWN5djZwN3p3OHhpMzR0OWJtdHNqc2lneTV0Nw==',
-        Authorization: `Bearer ${token}`
+    const response = await axios.post('(link unavailable)',
+      {
+        payload: {},
+        page,
+        limit: rowsPerPage
+      },
+      {
+        headers: {
+          'x-project': 'cmVhY3R0YXNrOmQ5aGVkeWN5djZwN3p3OHhpMzR0OWJtdHNqc2lneTV0Nw==',
+          Authorization: `Bearer ${token}`
+        }
       }
-    });
-
+    );
     const { list, num_pages } = response.data;
     setVideos(list);
     setTotalPages(num_pages);
@@ -44,24 +47,54 @@ const AdminDashboardPage = () => {
     setIsAuthenticated(false);
   }
 
+  const [{ isDragging }, drag] = useDrag(() => ({
+    type: 'video',
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  }));
+
+  const [, drop] = useDrop(() => ({
+    accept: 'video',
+    drop: (item) => {
+      const video = item.video;
+      const newVideos = [...videos];
+      newVideos.splice(video.index, 1);
+      setVideos(newVideos);
+    },
+  }));
+
   return (
-    <div>
+   <div>
       {isAuthenticated ? (
         <>
-          {videos.map((video) => (
-            <div key={'(link unavailable)'} >
-              <h2>{video.title}</h2>
-              <img src={video.photo} alt={video.title} />
-              <p>Username: {video.username}</p>
-              <p>Likes: {video.like}</p>
-            </div>
-          ))}
-          {page < totalPages && (
-            <button onClick={handleNextPage}>Next Page</button>
-          )}
+          <table ref={drag}>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Username</th>
+                <th>Likes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {videos.slice((page - 1) * rowsPerPage, page * rowsPerPage).map((video, index) => (
+                <tr key={('link unavailable')} ref={drop}>
+                  <td>{video.title}</td>
+                  <td>{video.username}</td>
+                  <td>{video.like}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            handleNextPage={handleNextPage}
+            handlePreviousPage={handlePreviousPage}
+          />
           <button onClick={handleLogout}>Logout</button>
         </>
-      ): (
+      ) : (
         <p>You are not logged in.</p>
       )}
     </div>
