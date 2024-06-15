@@ -5,7 +5,7 @@ import * as yup from "yup";
 import MkdSDK from "../utils/MkdSDK";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../authContext";
-import Snackbar from './Snackbar';
+import SnackBar from "../components/SnackBar";
 
 const AdminLoginPage = () => {
   const schema = yup
@@ -32,7 +32,7 @@ const AdminLoginPage = () => {
     try {
       const resp = await sdk.login(data.email, data.password, 'admin');
       dispatch({ type: 'LOGIN_SUCCESS', resp });
-      Snackbar.open(`Logged in successfully as ${data.email}`); 
+      SnackBar.open(`Logged in successfully as ${data.email}`); 
       window.location.href = "/AdminDashboardPage";
     } catch (error) {
       console.log('Submit error ->', error)
