@@ -28,6 +28,7 @@ const AdminLoginPage = () => {
 
   const onSubmit = async (data) => {
     let sdk = new MkdSDK();
+    console.log(sdk)
     //TODO
     try {
       const resp = await sdk.login(data.email, data.password, 'admin');

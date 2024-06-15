@@ -26,7 +26,7 @@ export default function MkdSDK() {
       localStorage.setItem('token', json.token);
       return json.user;
     } else {
-      throw new Error(json.message);
+      throw Error(json.message);
     }
   };
 
